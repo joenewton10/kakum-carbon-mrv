@@ -1,6 +1,10 @@
 import csv
 import os
 
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
 from carbon_mrv.carbon import carbon_stock_tco2e
 from carbon_mrv.config import load_config
 from carbon_mrv.raster import forest_area_ha
@@ -55,6 +59,28 @@ def write_results_csv(config, summary, sensitivity_rows):
     return path
 
 
+def write_sensitivity_chart(config, sensitivity_rows):
+    agb_values = [row[0] for row in sensitivity_rows]
+    co2e_values = [row[1] for row in sensitivity_rows]
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(agb_values, co2e_values, marker="o")
+    ax.axvline(
+        config.agb_mean_t_ha, color="red", linestyle="--",
+        label=f"Mean AGB ({config.agb_mean_t_ha} t/ha)",
+    )
+    ax.set_xlabel("AGB (t/ha)")
+    ax.set_ylabel("Total carbon stock incl. roots (tCO2e)")
+    ax.set_title("Kakum Forest Carbon Stock — Biomass Sensitivity")
+    ax.legend()
+    fig.tight_layout()
+
+    path = os.path.join(config.output_dir, "sensitivity_plot.png")
+    fig.savefig(path)
+    plt.close(fig)
+    return path
+
+
 def build_summary(config, area_ha):
     co2e_aboveground = carbon_stock_tco2e(
         area_ha, config.agb_mean_t_ha, config.carbon_fraction,
@@ -95,7 +121,9 @@ def main():
     sensitivity_rows = compute_sensitivity_rows(config, area_ha)
 
     csv_path = write_results_csv(config, summary, sensitivity_rows)
+    chart_path = write_sensitivity_chart(config, sensitivity_rows)
     print(f"Wrote {csv_path}")
+    print(f"Wrote {chart_path}")
     print(f"Forest area: {summary['forest_area_ha']:.2f} ha "
           f"({summary['pct_of_park_forested']:.1f}% of park)")
     print(f"Stock incl. roots: {summary['carbon_incl_roots_tCO2e']:,.0f} tCO2e")
