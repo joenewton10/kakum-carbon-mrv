@@ -11,7 +11,7 @@ Python does area verification, carbon accounting, uncertainty, and charts.
 - Exporting the classified raster from GEE as GeoTIFF in EPSG:32630 (UTM 30N),
   10m pixels, so area = (forest pixel count) x 100 m². File goes in ./data/.
 - Python env built in .venv (Python 3.14). Installed: rasterio, numpy, pandas,
-  matplotlib, pyyaml, tifffile. Pinned in requirements.txt.
+  matplotlib, pyyaml, tifffile, pytest. Pinned in requirements.txt.
 
 ## Blocker hit (resolved)
 `import rasterio` failed with "An Application Control policy has blocked this file".
@@ -43,5 +43,9 @@ for the implementation plan). Running `run.py` reproduces the known GEE
 numbers: forest area ~18,817 ha, stock incl. roots ~12.47M tCO2e, combined
 uncertainty ~61.5%, conservative estimate ~4.80M tCO2e. Outputs land in
 outputs/results.csv and outputs/sensitivity_plot.png.
+
+`run.py` loads `config.yaml` via a bare relative path, so it must be run
+from the project root, using the venv's Python: `.venv\Scripts\python.exe run.py`
+(Windows).
 
 Next: extend beyond reproducing the GEE numbers (scope TBD with the user).

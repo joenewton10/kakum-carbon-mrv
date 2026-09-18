@@ -10,7 +10,7 @@ biomass:
   agb_min_t_ha: 130
   agb_max_t_ha: 510
   carbon_fraction: 0.47
-  co2_to_c_ratio: 3.6667
+  co2_to_c_ratio: 3.6666666666666665  # 44/12
   root_shoot_ratio: 0.24
 
 classification:

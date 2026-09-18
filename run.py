@@ -39,7 +39,7 @@ def compute_sensitivity_rows(config, area_ha):
 
 def write_results_csv(config, summary, sensitivity_rows):
     path = os.path.join(config.output_dir, "results.csv")
-    with open(path, "w", newline="") as f:
+    with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(CSV_COLUMNS)
         writer.writerow([
