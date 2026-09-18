@@ -16,7 +16,10 @@ accounting, and uncertainty analysis.
 | Classification accuracy | **95.5%** |
 | Tests | **10/10 passing** |
 
-![Biomass sensitivity chart](outputs/sensitivity_plot.png)
+![Classified forest map: dark green forest and tan non-forest inside the red WDPA park boundary, with blue forest and green non-forest training points](docs/images/classified_forest_map.png)
+
+*Forest (dark green) and non-forest (tan) inside Kakum, clipped to the official WDPA
+boundary (red). Blue pins are forest training points, green pins non-forest.*
 
 ## How it works
 
@@ -34,8 +37,14 @@ flowchart LR
    2023 Sentinel-2 imagery separates forest from non-forest across the official WDPA
    "Kakum" boundary (95.5% held-out accuracy). See [`gee/`](gee/). A simple NDVI
    threshold doesn't work here: forest and surrounding farmland differ by only
-   ~0.04 in NDVI in this humid landscape, so the classifier instead uses
+   ~0.04 in NDVI in this humid landscape (below), so the classifier instead uses
    shortwave-infrared bands to tell them apart.
+
+   ![NDVI over the study area: forest and farmland are nearly indistinguishable shades of green; only towns and roads stand out in yellow](docs/images/ndvi_comparison.png)
+
+   *NDVI over the study area. Forest and farmland are nearly indistinguishable; only
+   towns and roads (yellow) separate cleanly. This is why a single greenness
+   threshold doesn't work here.*
 2. **Export**: the classified raster is exported as a GeoTIFF (EPSG:32630, 10 m
    pixels) into [`data/`](data/).
 3. **Analysis (this Python package)**: [`run.py`](run.py) reads the GeoTIFF, computes
@@ -52,12 +61,15 @@ next step: swapping in site-specific biomass from NASA's GEDI spaceborne lidar,
 which should narrow the range substantially. See [`ROADMAP.md`](ROADMAP.md) for the
 full plan.
 
+![Biomass sensitivity chart: total carbon stock incl. roots plotted against AGB from 130 to 510 t/ha, with the mean AGB of 310 t/ha marked](outputs/sensitivity_plot.png)
+
 ## Repo structure
 
 ```
 README.md               Project overview (this file)
 ROADMAP.md              Planned Tier 2 (GEDI biomass) upgrade
 METHODOLOGY.md          Note on the VM0048 jurisdictional baseline
+docs/images/            Figures used in README.md
 gee/                    Earth Engine classifier script
 data/                   Input GeoTIFF (classified raster from GEE)
 carbon_mrv/             Python package: area, carbon, and uncertainty calculations
