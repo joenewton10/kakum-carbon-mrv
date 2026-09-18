@@ -6,6 +6,8 @@ real Verra REDD+ (VM0048) project. Google Earth Engine handles the pixel
 classification; a tested Python package handles area verification, carbon
 accounting, and uncertainty analysis.
 
+Full write-up: [`Kakum_MRV_Report.pdf`](Kakum_MRV_Report.pdf).
+
 | Metric | Value |
 |---|---|
 | Forest area | **18,817 ha** (of 21,168 ha park) |
@@ -67,6 +69,7 @@ full plan.
 
 ```
 README.md               Project overview (this file)
+Kakum_MRV_Report.pdf    Full narrative write-up
 ROADMAP.md              Planned Tier 2 (GEDI biomass) upgrade
 METHODOLOGY.md          Note on the VM0048 jurisdictional baseline
 docs/images/            Figures used in README.md
