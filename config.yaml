@@ -1,0 +1,23 @@
+raster:
+  path: data/kakum_classified.tif
+  forest_value: 1
+
+park:
+  total_area_ha: 21168
+
+biomass:
+  agb_mean_t_ha: 310
+  agb_min_t_ha: 130
+  agb_max_t_ha: 510
+  carbon_fraction: 0.47
+  co2_to_c_ratio: 3.6667
+  root_shoot_ratio: 0.24
+
+classification:
+  accuracy_pct: 95.5
+
+sensitivity:
+  step_t_ha: 10
+
+output:
+  dir: outputs
