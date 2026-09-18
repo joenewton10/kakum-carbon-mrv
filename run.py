@@ -70,7 +70,7 @@ def write_sensitivity_chart(config, sensitivity_rows):
     )
     ax.set_xlabel("AGB (t/ha)")
     ax.set_ylabel("Total carbon stock incl. roots (tCO2e)")
-    ax.set_title("Kakum Forest Carbon Stock — Biomass Sensitivity")
+    ax.set_title("Kakum Forest Carbon Stock: Biomass Sensitivity")
     ax.legend()
     fig.tight_layout()
 

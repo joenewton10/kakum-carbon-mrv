@@ -1,5 +1,5 @@
 // ============================================================
-// FOREST CARBON MRV — KAKUM NATIONAL PARK, GHANA
+// FOREST CARBON MRV: KAKUM NATIONAL PARK, GHANA
 // Google Earth Engine (JavaScript). Pixel + classification half
 // of the pipeline; exports a classified GeoTIFF that the Python
 // package (../) reads for carbon accounting and uncertainty.

@@ -1,7 +1,7 @@
 # Kakum Forest Carbon MRV
 
 A satellite-based forest carbon Measurement, Reporting & Verification (MRV) prototype
-for Kakum National Park, Ghana — structured to mirror the measurement logic of a
+for Kakum National Park, Ghana, structured to mirror the measurement logic of a
 real Verra REDD+ (VM0048) project. Google Earth Engine handles the pixel
 classification; a tested Python package handles area verification, carbon
 accounting, and uncertainty analysis.
@@ -30,15 +30,15 @@ flowchart LR
     F --> G["results_summary.csv<br/>biomass_sensitivity.csv<br/>sensitivity_plot.png"]
 ```
 
-1. **Classification (Google Earth Engine)** — a Random Forest classifier trained on
+1. **Classification (Google Earth Engine)**: a Random Forest classifier trained on
    2023 Sentinel-2 imagery separates forest from non-forest across the official WDPA
    "Kakum" boundary (95.5% held-out accuracy). See [`gee/`](gee/). A simple NDVI
-   threshold doesn't work here — forest and surrounding farmland differ by only
+   threshold doesn't work here: forest and surrounding farmland differ by only
    ~0.04 in NDVI in this humid landscape, so the classifier instead uses
    shortwave-infrared bands to tell them apart.
-2. **Export** — the classified raster is exported as a GeoTIFF (EPSG:32630, 10 m
+2. **Export**: the classified raster is exported as a GeoTIFF (EPSG:32630, 10 m
    pixels) into [`data/`](data/).
-3. **Analysis (this Python package)** — [`run.py`](run.py) reads the GeoTIFF, computes
+3. **Analysis (this Python package)**: [`run.py`](run.py) reads the GeoTIFF, computes
    forest area from the pixel count, applies IPCC Tier 1 biomass defaults to get
    carbon stock, and propagates uncertainty (classification error and biomass-default
    range, combined in quadrature) through to a conservative lower-bound estimate.
@@ -47,7 +47,7 @@ flowchart LR
 
 The 95.5%-accurate classifier contributes only ~4.5% of the total error. The other
 ~61% comes from the IPCC Tier 1 biomass default (a continent-wide average with a
-130–510 t/ha range) — not from the map. That diagnosis is what motivates the planned
+130–510 t/ha range), not from the map. That diagnosis is what motivates the planned
 next step: swapping in site-specific biomass from NASA's GEDI spaceborne lidar,
 which should narrow the range substantially. See [`ROADMAP.md`](ROADMAP.md) for the
 full plan.
@@ -57,6 +57,7 @@ full plan.
 ```
 README.md               Project overview (this file)
 ROADMAP.md              Planned Tier 2 (GEDI biomass) upgrade
+METHODOLOGY.md          Note on the VM0048 jurisdictional baseline
 gee/                    Earth Engine classifier script
 data/                   Input GeoTIFF (classified raster from GEE)
 carbon_mrv/             Python package: area, carbon, and uncertainty calculations
@@ -95,14 +96,15 @@ Run the tests:
 
 ## Honest limitations
 
-- This is a carbon **stock** at a single date, not an emissions estimate — an
+- This is a carbon **stock** at a single date, not an emissions estimate: an
   emissions figure needs a second image date to measure change over time.
 - Biomass uses IPCC Tier 1 (continent-average) defaults, hence the wide uncertainty
   range; see "Why the uncertainty matters" above.
-- This is a portfolio prototype, not a registered carbon credit. A real Verra VM0048
-  project would substitute Verra's jurisdictional baseline for the classification
-  step shown here.
+- This is a portfolio prototype, not a registered carbon credit. It reproduces the
+  measurement side (forest map, area, carbon stock); a real Verra VM0048 project
+  also needs an external jurisdictional baseline, which a developer does not
+  produce. See [`METHODOLOGY.md`](METHODOLOGY.md) for the full explanation.
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE).
+MIT. See [`LICENSE`](LICENSE).
