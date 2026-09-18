@@ -20,6 +20,16 @@ accounting, and uncertainty analysis.
 
 ## How it works
 
+```mermaid
+flowchart LR
+    A["Sentinel-2 imagery<br/>2023 composite"] --> B["Random Forest classifier<br/>(Google Earth Engine)"]
+    B --> C["Classified GeoTIFF<br/>forest / non-forest, 10m"]
+    C --> D["carbon_mrv.raster<br/>pixel count → hectares"]
+    D --> E["carbon_mrv.carbon<br/>AGB → carbon → CO2e"]
+    E --> F["carbon_mrv.uncertainty<br/>error propagation"]
+    F --> G["results_summary.csv<br/>biomass_sensitivity.csv<br/>sensitivity_plot.png"]
+```
+
 1. **Classification (Google Earth Engine)** — a Random Forest classifier trained on
    2023 Sentinel-2 imagery separates forest from non-forest across the official WDPA
    "Kakum" boundary (95.5% held-out accuracy). See [`gee/`](gee/). A simple NDVI
@@ -39,24 +49,26 @@ The 95.5%-accurate classifier contributes only ~4.5% of the total error. The oth
 ~61% comes from the IPCC Tier 1 biomass default (a continent-wide average with a
 130–510 t/ha range) — not from the map. That diagnosis is what motivates the planned
 next step: swapping in site-specific biomass from NASA's GEDI spaceborne lidar,
-which should narrow the range substantially. See [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md)
-for the full writeup of that plan.
+which should narrow the range substantially. See [`ROADMAP.md`](ROADMAP.md) for the
+full plan.
 
 ## Repo structure
 
 ```
+README.md               Project overview (this file)
+ROADMAP.md              Planned Tier 2 (GEDI biomass) upgrade
 gee/                    Earth Engine classifier script
 data/                   Input GeoTIFF (classified raster from GEE)
 carbon_mrv/             Python package: area, carbon, and uncertainty calculations
   config.py             Loads and validates config.yaml
   raster.py             Forest area from the classified GeoTIFF (rasterio)
   carbon.py             Biomass -> carbon -> CO2e (pure functions)
-  uncertainty.py         Area/biomass/combined uncertainty, conservative estimate
+  uncertainty.py        Area/biomass/combined uncertainty, conservative estimate
 run.py                  Orchestrates the pipeline end to end
-config.yaml              All science parameters (AGB, carbon fraction, ratios, etc.)
-tests/                   Unit tests for carbon.py and uncertainty.py
-outputs/                 Generated: results_summary.csv, biomass_sensitivity.csv,
-                         sensitivity_plot.png
+config.yaml             All science parameters (AGB, carbon fraction, ratios, etc.)
+tests/                  Unit tests for carbon.py and uncertainty.py
+outputs/                Generated: results_summary.csv, biomass_sensitivity.csv,
+                        sensitivity_plot.png
 ```
 
 ## Running it
