@@ -6,8 +6,7 @@ real Verra REDD+ (VM0048) project. Google Earth Engine handles the pixel
 classification; a tested Python package handles area verification, carbon
 accounting, and uncertainty analysis.
 
-Full write-up: [`Kakum_MRV_Report.pdf`](Kakum_MRV_Report.pdf). Why this matters for
-monitoring, evaluation and certification: [`docs/VALUE_MEMO.md`](docs/VALUE_MEMO.md).
+Full write-up: [`Kakum_MRV_Report.pdf`](Kakum_MRV_Report.pdf).
 
 | Metric | Value |
 |---|---|
@@ -73,7 +72,6 @@ README.md               Project overview (this file)
 Kakum_MRV_Report.pdf    Full narrative write-up
 ROADMAP.md              Planned Tier 2 (GEDI biomass) upgrade
 METHODOLOGY.md          Note on the VM0048 jurisdictional baseline
-docs/VALUE_MEMO.md      Value memo for MEL and certification audiences
 docs/images/            Figures used in README.md
 gee/                    Earth Engine classifier script
 data/                   Input GeoTIFF (classified raster from GEE)
