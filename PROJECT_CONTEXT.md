@@ -36,8 +36,12 @@ the GeoTIFF if needed.
 - Combined uncertainty ~61.5% (area ~4.5% and biomass ~61% in quadrature)
 - Conservative estimate (lower bound): ~4.8 M tCO2e
 
-## Goal for the Python side
-config.yaml (parameters) + a carbon_mrv module (rasterio/tifffile area calc +
-carbon + uncertainty functions) + a runner that writes a results CSV and charts
-(including a biomass sensitivity plot), + requirements.txt. Reproduce the GEE
-numbers first, then extend.
+## Goal for the Python side (done)
+config.yaml + carbon_mrv module (raster/carbon/uncertainty) + run.py + tests
+are all in place (see docs/superpowers/plans/2026-09-18-carbon-mrv-pipeline.md
+for the implementation plan). Running `run.py` reproduces the known GEE
+numbers: forest area ~18,817 ha, stock incl. roots ~12.47M tCO2e, combined
+uncertainty ~61.5%, conservative estimate ~4.80M tCO2e. Outputs land in
+outputs/results.csv and outputs/sensitivity_plot.png.
+
+Next: extend beyond reproducing the GEE numbers (scope TBD with the user).
