@@ -15,13 +15,15 @@ from carbon_mrv.uncertainty import (
     conservative_estimate_tco2e,
 )
 
-CSV_COLUMNS = [
-    "row_type", "forest_area_ha", "park_total_area_ha", "pct_of_park_forested",
+SUMMARY_CSV_COLUMNS = [
+    "forest_area_ha", "park_total_area_ha", "pct_of_park_forested",
     "agb_used_t_ha", "carbon_aboveground_tC", "carbon_aboveground_tCO2e",
     "carbon_incl_roots_tC", "carbon_incl_roots_tCO2e",
     "area_uncertainty_pct", "biomass_uncertainty_pct", "combined_uncertainty_pct",
-    "conservative_estimate_tCO2e", "agb_t_ha", "total_co2e_t",
+    "conservative_estimate_tCO2e",
 ]
+
+SENSITIVITY_CSV_COLUMNS = ["agb_t_ha", "total_co2e_t"]
 
 
 def compute_sensitivity_rows(config, area_ha):
@@ -37,25 +39,22 @@ def compute_sensitivity_rows(config, area_ha):
     return rows
 
 
-def write_results_csv(config, summary, sensitivity_rows):
-    path = os.path.join(config.output_dir, "results.csv")
+def write_summary_csv(config, summary):
+    path = os.path.join(config.output_dir, "results_summary.csv")
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(CSV_COLUMNS)
-        writer.writerow([
-            "summary", summary["forest_area_ha"], summary["park_total_area_ha"],
-            summary["pct_of_park_forested"], summary["agb_used_t_ha"],
-            summary["carbon_aboveground_tC"], summary["carbon_aboveground_tCO2e"],
-            summary["carbon_incl_roots_tC"], summary["carbon_incl_roots_tCO2e"],
-            summary["area_uncertainty_pct"], summary["biomass_uncertainty_pct"],
-            summary["combined_uncertainty_pct"], summary["conservative_estimate_tCO2e"],
-            "", "",
-        ])
+        writer.writerow(SUMMARY_CSV_COLUMNS)
+        writer.writerow([summary[column] for column in SUMMARY_CSV_COLUMNS])
+    return path
+
+
+def write_sensitivity_csv(config, sensitivity_rows):
+    path = os.path.join(config.output_dir, "biomass_sensitivity.csv")
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(SENSITIVITY_CSV_COLUMNS)
         for agb, co2e in sensitivity_rows:
-            writer.writerow([
-                "sensitivity", "", "", "", "", "", "", "", "", "", "", "", "",
-                agb, co2e,
-            ])
+            writer.writerow([agb, co2e])
     return path
 
 
@@ -120,9 +119,11 @@ def main():
     summary = build_summary(config, area_ha)
     sensitivity_rows = compute_sensitivity_rows(config, area_ha)
 
-    csv_path = write_results_csv(config, summary, sensitivity_rows)
+    summary_csv_path = write_summary_csv(config, summary)
+    sensitivity_csv_path = write_sensitivity_csv(config, sensitivity_rows)
     chart_path = write_sensitivity_chart(config, sensitivity_rows)
-    print(f"Wrote {csv_path}")
+    print(f"Wrote {summary_csv_path}")
+    print(f"Wrote {sensitivity_csv_path}")
     print(f"Wrote {chart_path}")
     print(f"Forest area: {summary['forest_area_ha']:.2f} ha "
           f"({summary['pct_of_park_forested']:.1f}% of park)")
