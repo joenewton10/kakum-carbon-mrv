@@ -1,0 +1,108 @@
+import csv
+import os
+
+from carbon_mrv.carbon import carbon_stock_tco2e
+from carbon_mrv.config import load_config
+from carbon_mrv.raster import forest_area_ha
+from carbon_mrv.uncertainty import (
+    area_uncertainty_pct,
+    biomass_uncertainty_pct,
+    combined_uncertainty_pct,
+    conservative_estimate_tco2e,
+)
+
+CSV_COLUMNS = [
+    "row_type", "forest_area_ha", "park_total_area_ha", "pct_of_park_forested",
+    "agb_used_t_ha", "carbon_aboveground_tC", "carbon_aboveground_tCO2e",
+    "carbon_incl_roots_tC", "carbon_incl_roots_tCO2e",
+    "area_uncertainty_pct", "biomass_uncertainty_pct", "combined_uncertainty_pct",
+    "conservative_estimate_tCO2e", "agb_t_ha", "total_co2e_t",
+]
+
+
+def compute_sensitivity_rows(config, area_ha):
+    rows = []
+    agb = config.agb_min_t_ha
+    while agb <= config.agb_max_t_ha + 1e-9:
+        co2e = carbon_stock_tco2e(
+            area_ha, agb, config.carbon_fraction,
+            config.co2_to_c_ratio, config.root_shoot_ratio, include_roots=True,
+        )
+        rows.append((agb, co2e))
+        agb += config.sensitivity_step_t_ha
+    return rows
+
+
+def write_results_csv(config, summary, sensitivity_rows):
+    path = os.path.join(config.output_dir, "results.csv")
+    with open(path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(CSV_COLUMNS)
+        writer.writerow([
+            "summary", summary["forest_area_ha"], summary["park_total_area_ha"],
+            summary["pct_of_park_forested"], summary["agb_used_t_ha"],
+            summary["carbon_aboveground_tC"], summary["carbon_aboveground_tCO2e"],
+            summary["carbon_incl_roots_tC"], summary["carbon_incl_roots_tCO2e"],
+            summary["area_uncertainty_pct"], summary["biomass_uncertainty_pct"],
+            summary["combined_uncertainty_pct"], summary["conservative_estimate_tCO2e"],
+            "", "",
+        ])
+        for agb, co2e in sensitivity_rows:
+            writer.writerow([
+                "sensitivity", "", "", "", "", "", "", "", "", "", "", "", "",
+                agb, co2e,
+            ])
+    return path
+
+
+def build_summary(config, area_ha):
+    co2e_aboveground = carbon_stock_tco2e(
+        area_ha, config.agb_mean_t_ha, config.carbon_fraction,
+        config.co2_to_c_ratio, config.root_shoot_ratio, include_roots=False,
+    )
+    co2e_incl_roots = carbon_stock_tco2e(
+        area_ha, config.agb_mean_t_ha, config.carbon_fraction,
+        config.co2_to_c_ratio, config.root_shoot_ratio, include_roots=True,
+    )
+    area_pct = area_uncertainty_pct(config.classification_accuracy_pct)
+    biomass_pct = biomass_uncertainty_pct(
+        config.agb_min_t_ha, config.agb_max_t_ha, config.agb_mean_t_ha
+    )
+    combined_pct = combined_uncertainty_pct(area_pct, biomass_pct)
+
+    return {
+        "forest_area_ha": area_ha,
+        "park_total_area_ha": config.park_total_area_ha,
+        "pct_of_park_forested": area_ha / config.park_total_area_ha * 100.0,
+        "agb_used_t_ha": config.agb_mean_t_ha,
+        "carbon_aboveground_tC": co2e_aboveground / config.co2_to_c_ratio,
+        "carbon_aboveground_tCO2e": co2e_aboveground,
+        "carbon_incl_roots_tC": co2e_incl_roots / config.co2_to_c_ratio,
+        "carbon_incl_roots_tCO2e": co2e_incl_roots,
+        "area_uncertainty_pct": area_pct,
+        "biomass_uncertainty_pct": biomass_pct,
+        "combined_uncertainty_pct": combined_pct,
+        "conservative_estimate_tCO2e": conservative_estimate_tco2e(co2e_incl_roots, combined_pct),
+    }
+
+
+def main():
+    config = load_config("config.yaml")
+    os.makedirs(config.output_dir, exist_ok=True)
+
+    area_ha = forest_area_ha(config.raster_path, config.forest_value)
+    summary = build_summary(config, area_ha)
+    sensitivity_rows = compute_sensitivity_rows(config, area_ha)
+
+    csv_path = write_results_csv(config, summary, sensitivity_rows)
+    print(f"Wrote {csv_path}")
+    print(f"Forest area: {summary['forest_area_ha']:.2f} ha "
+          f"({summary['pct_of_park_forested']:.1f}% of park)")
+    print(f"Stock incl. roots: {summary['carbon_incl_roots_tCO2e']:,.0f} tCO2e")
+    print(f"Conservative estimate: {summary['conservative_estimate_tCO2e']:,.0f} tCO2e")
+
+    return summary, sensitivity_rows
+
+
+if __name__ == "__main__":
+    main()
